@@ -23,7 +23,7 @@ paths:
                 "200":
                     description: OK response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/GeneralHealthCheckResponseBody'
             schemes:
                 - http
     /openapi.json:
@@ -39,3 +39,14 @@ paths:
                         type: file
             schemes:
                 - http
+definitions:
+    GeneralHealthCheckResponseBody:
+        title: GeneralHealthCheckResponseBody
+        type: object
+        properties:
+            status:
+                type: string
+                description: Status of the service
+                example: Cumque vel amet sed id provident non.
+        example:
+            status: Velit inventore voluptatem provident in nihil.

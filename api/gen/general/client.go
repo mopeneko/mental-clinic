@@ -26,11 +26,11 @@ func NewClient(healthCheck goa.Endpoint) *Client {
 }
 
 // HealthCheck calls the "healthCheck" endpoint of the "general" service.
-func (c *Client) HealthCheck(ctx context.Context) (res string, err error) {
+func (c *Client) HealthCheck(ctx context.Context) (res *HealthCheckResult, err error) {
 	var ires any
 	ires, err = c.HealthCheckEndpoint(ctx, nil)
 	if err != nil {
 		return
 	}
-	return ires.(string), nil
+	return ires.(*HealthCheckResult), nil
 }

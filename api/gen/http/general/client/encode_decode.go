@@ -52,14 +52,15 @@ func DecodeHealthCheckResponse(decoder func(*http.Response) goahttp.Decoder, res
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body string
+				body HealthCheckResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("general", "healthCheck", err)
 			}
-			return body, nil
+			res := NewHealthCheckResultOK(&body)
+			return res, nil
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("general", "healthCheck", resp.StatusCode, string(body))

@@ -18,9 +18,9 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: string
-                                example: Velit inventore voluptatem provident in nihil.
-                            example: Perspiciatis et est.
+                                $ref: '#/components/schemas/HealthCheckResult'
+                            example:
+                                status: Veniam occaecati autem nostrum consequuntur.
     /openapi.json:
         get:
             tags:
@@ -30,7 +30,17 @@ paths:
             responses:
                 "200":
                     description: File downloaded
-components: {}
+components:
+    schemas:
+        HealthCheckResult:
+            type: object
+            properties:
+                status:
+                    type: string
+                    description: Status of the service
+                    example: Perspiciatis et est.
+            example:
+                status: Accusantium sunt maiores ut.
 tags:
     - name: general
       description: Service for general users

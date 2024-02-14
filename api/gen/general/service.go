@@ -14,7 +14,7 @@ import (
 // Service for general users
 type Service interface {
 	// HealthCheck implements healthCheck.
-	HealthCheck(context.Context) (res string, err error)
+	HealthCheck(context.Context) (res *HealthCheckResult, err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -32,3 +32,10 @@ const ServiceName = "general"
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
 var MethodNames = [1]string{"healthCheck"}
+
+// HealthCheckResult is the result type of the general service healthCheck
+// method.
+type HealthCheckResult struct {
+	// Status of the service
+	Status *string
+}

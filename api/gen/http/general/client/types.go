@@ -6,3 +6,24 @@
 // $ goa gen github.com/mopeneko/mental-clinic/api/design -o api
 
 package client
+
+import (
+	general "github.com/mopeneko/mental-clinic/api/gen/general"
+)
+
+// HealthCheckResponseBody is the type of the "general" service "healthCheck"
+// endpoint HTTP response body.
+type HealthCheckResponseBody struct {
+	// Status of the service
+	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+}
+
+// NewHealthCheckResultOK builds a "general" service "healthCheck" endpoint
+// result from a HTTP "OK" response.
+func NewHealthCheckResultOK(body *HealthCheckResponseBody) *general.HealthCheckResult {
+	v := &general.HealthCheckResult{
+		Status: body.Status,
+	}
+
+	return v
+}
