@@ -1,0 +1,36 @@
+openapi: 3.0.3
+info:
+    title: mental-clinic.social General Service
+    description: Service for general users
+    version: 0.0.1
+servers:
+    - url: http://localhost:8080
+paths:
+    /health_check:
+        get:
+            tags:
+                - general
+            summary: healthCheck general
+            operationId: general#healthCheck
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Velit inventore voluptatem provident in nihil.
+                            example: Perspiciatis et est.
+    /openapi.json:
+        get:
+            tags:
+                - general
+            summary: Download ./gen/http/openapi.json
+            operationId: general#/openapi.json
+            responses:
+                "200":
+                    description: File downloaded
+components: {}
+tags:
+    - name: general
+      description: Service for general users

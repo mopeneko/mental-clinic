@@ -1,0 +1,41 @@
+swagger: "2.0"
+info:
+    title: mental-clinic.social General Service
+    description: Service for general users
+    version: 0.0.1
+host: localhost:8080
+consumes:
+    - application/json
+    - application/xml
+    - application/gob
+produces:
+    - application/json
+    - application/xml
+    - application/gob
+paths:
+    /health_check:
+        get:
+            tags:
+                - general
+            summary: healthCheck general
+            operationId: general#healthCheck
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        type: string
+            schemes:
+                - http
+    /openapi.json:
+        get:
+            tags:
+                - general
+            summary: Download ./gen/http/openapi.json
+            operationId: general#/openapi.json
+            responses:
+                "200":
+                    description: File downloaded
+                    schema:
+                        type: file
+            schemes:
+                - http
