@@ -5,6 +5,7 @@ import (
 	"log"
 
 	general "github.com/mopeneko/mental-clinic/api/gen/general"
+	"github.com/samber/lo"
 )
 
 // general service example implementation.
@@ -19,7 +20,6 @@ func NewGeneral(logger *log.Logger) general.Service {
 }
 
 // HealthCheck implements healthCheck.
-func (s *generalsrvc) HealthCheck(ctx context.Context) (res string, err error) {
-	s.logger.Print("general.healthCheck")
-	return
+func (s *generalsrvc) HealthCheck(ctx context.Context) (res *general.HealthCheckResult, err error) {
+	return &general.HealthCheckResult{Status: lo.ToPtr("OK")}, nil
 }
