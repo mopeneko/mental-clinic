@@ -1,6 +1,8 @@
 package design
 
-import . "goa.design/goa/v3/dsl"
+import (
+	. "goa.design/goa/v3/dsl"
+)
 
 var _ = API("general", func() {
 	Title("mental-clinic.social General Service")
@@ -12,11 +14,15 @@ var _ = API("general", func() {
 	})
 })
 
+var HealthCheckResult = Type("HealthCheckResult", func() {
+	Attribute("status", String, "Status of the service")
+})
+
 var _ = Service("general", func() {
 	Description("Service for general users")
 
 	Method("healthCheck", func() {
-		Result(String)
+		Result(HealthCheckResult)
 
 		HTTP(func() {
 			GET("/health_check")
