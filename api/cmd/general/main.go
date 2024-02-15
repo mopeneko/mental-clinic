@@ -14,6 +14,7 @@ import (
 
 	generalapi "github.com/mopeneko/mental-clinic/api"
 	general "github.com/mopeneko/mental-clinic/api/gen/general"
+	"github.com/mopeneko/mental-clinic/api/repository"
 )
 
 func main() {
@@ -36,12 +37,26 @@ func main() {
 		logger = log.New(os.Stderr, "[generalapi] ", log.Ltime)
 	}
 
+	var (
+		authRepo *repository.Auth
+	)
+	{
+		auth, err := repository.NewAuth(
+			context.Background(),
+			os.Getenv("AUTH0_DOMAIN"),
+		)
+		if err != nil {
+			logger.Fatalf("failed to create auth repository: %+v", err)
+		}
+		authRepo = auth
+	}
+
 	// Initialize the services.
 	var (
 		generalSvc general.Service
 	)
 	{
-		generalSvc = generalapi.NewGeneral(logger)
+		generalSvc = generalapi.NewGeneral(logger, authRepo)
 	}
 
 	// Wrap the services in endpoints that can be invoked from other services
