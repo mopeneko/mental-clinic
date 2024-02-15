@@ -16,6 +16,14 @@ var _ = API("general", func() {
 
 var HealthCheckResult = Type("HealthCheckResult", func() {
 	Attribute("status", String, "Status of the service")
+
+	Required("status")
+})
+
+var AuthResult = Type("AuthResult", func() {
+	Attribute("authURL", String, "URL for authorization")
+
+	Required("authURL")
 })
 
 var _ = Service("general", func() {
@@ -26,6 +34,16 @@ var _ = Service("general", func() {
 
 		HTTP(func() {
 			GET("/health_check")
+
+			Response(StatusOK)
+		})
+	})
+
+	Method("auth", func() {
+		Result(AuthResult)
+
+		HTTP(func() {
+			GET("/auth")
 
 			Response(StatusOK)
 		})
