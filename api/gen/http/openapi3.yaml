@@ -6,6 +6,21 @@ info:
 servers:
     - url: http://localhost:8080
 paths:
+    /auth:
+        get:
+            tags:
+                - general
+            summary: auth general
+            operationId: general#auth
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthResult'
+                            example:
+                                authURL: Velit inventore voluptatem provident in nihil.
     /health_check:
         get:
             tags:
@@ -20,7 +35,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/HealthCheckResult'
                             example:
-                                status: Veniam occaecati autem nostrum consequuntur.
+                                status: Cumque vel amet sed id provident non.
     /openapi.json:
         get:
             tags:
@@ -32,15 +47,28 @@ paths:
                     description: File downloaded
 components:
     schemas:
+        AuthResult:
+            type: object
+            properties:
+                authURL:
+                    type: string
+                    description: URL for authorization
+                    example: Quia omnis earum consequatur maxime omnis illo.
+            example:
+                authURL: Reiciendis alias dolor odit dignissimos.
+            required:
+                - authURL
         HealthCheckResult:
             type: object
             properties:
                 status:
                     type: string
                     description: Status of the service
-                    example: Perspiciatis et est.
+                    example: Quia rerum quia dolore.
             example:
-                status: Accusantium sunt maiores ut.
+                status: Nam expedita molestiae.
+            required:
+                - status
 tags:
     - name: general
       description: Service for general users

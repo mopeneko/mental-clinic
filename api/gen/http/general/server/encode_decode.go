@@ -26,3 +26,15 @@ func EncodeHealthCheckResponse(encoder func(context.Context, http.ResponseWriter
 		return enc.Encode(body)
 	}
 }
+
+// EncodeAuthResponse returns an encoder for responses returned by the general
+// auth endpoint.
+func EncodeAuthResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		res, _ := v.(*general.AuthResult)
+		enc := encoder(ctx, w)
+		body := NewAuthResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}

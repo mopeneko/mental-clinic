@@ -16,18 +16,21 @@ import (
 // Endpoints wraps the "general" service endpoints.
 type Endpoints struct {
 	HealthCheck goa.Endpoint
+	Auth        goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "general" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		HealthCheck: NewHealthCheckEndpoint(s),
+		Auth:        NewAuthEndpoint(s),
 	}
 }
 
 // Use applies the given middleware to all the "general" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.HealthCheck = m(e.HealthCheck)
+	e.Auth = m(e.Auth)
 }
 
 // NewHealthCheckEndpoint returns an endpoint function that calls the method
@@ -35,5 +38,13 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 func NewHealthCheckEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		return s.HealthCheck(ctx)
+	}
+}
+
+// NewAuthEndpoint returns an endpoint function that calls the method "auth" of
+// service "general".
+func NewAuthEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		return s.Auth(ctx)
 	}
 }

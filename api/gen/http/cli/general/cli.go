@@ -22,7 +22,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `general health-check
+	return `general (health-check|auth)
 `
 }
 
@@ -45,9 +45,12 @@ func ParseEndpoint(
 		generalFlags = flag.NewFlagSet("general", flag.ContinueOnError)
 
 		generalHealthCheckFlags = flag.NewFlagSet("health-check", flag.ExitOnError)
+
+		generalAuthFlags = flag.NewFlagSet("auth", flag.ExitOnError)
 	)
 	generalFlags.Usage = generalUsage
 	generalHealthCheckFlags.Usage = generalHealthCheckUsage
+	generalAuthFlags.Usage = generalAuthUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -86,6 +89,9 @@ func ParseEndpoint(
 			case "health-check":
 				epf = generalHealthCheckFlags
 
+			case "auth":
+				epf = generalAuthFlags
+
 			}
 
 		}
@@ -114,6 +120,9 @@ func ParseEndpoint(
 			case "health-check":
 				endpoint = c.HealthCheck()
 				data = nil
+			case "auth":
+				endpoint = c.Auth()
+				data = nil
 			}
 		}
 	}
@@ -132,6 +141,7 @@ Usage:
 
 COMMAND:
     health-check: HealthCheck implements healthCheck.
+    auth: Auth implements auth.
 
 Additional help:
     %[1]s general COMMAND --help
@@ -144,5 +154,15 @@ HealthCheck implements healthCheck.
 
 Example:
     %[1]s general health-check
+`, os.Args[0])
+}
+
+func generalAuthUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] general auth
+
+Auth implements auth.
+
+Example:
+    %[1]s general auth
 `, os.Args[0])
 }

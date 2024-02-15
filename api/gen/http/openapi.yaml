@@ -13,6 +13,21 @@ produces:
     - application/xml
     - application/gob
 paths:
+    /auth:
+        get:
+            tags:
+                - general
+            summary: auth general
+            operationId: general#auth
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/GeneralAuthResponseBody'
+                        required:
+                            - authURL
+            schemes:
+                - http
     /health_check:
         get:
             tags:
@@ -24,6 +39,8 @@ paths:
                     description: OK response.
                     schema:
                         $ref: '#/definitions/GeneralHealthCheckResponseBody'
+                        required:
+                            - status
             schemes:
                 - http
     /openapi.json:
@@ -40,6 +57,18 @@ paths:
             schemes:
                 - http
 definitions:
+    GeneralAuthResponseBody:
+        title: GeneralAuthResponseBody
+        type: object
+        properties:
+            authURL:
+                type: string
+                description: URL for authorization
+                example: Eos reiciendis.
+        example:
+            authURL: Error pariatur qui animi est voluptatibus.
+        required:
+            - authURL
     GeneralHealthCheckResponseBody:
         title: GeneralHealthCheckResponseBody
         type: object
@@ -47,6 +76,8 @@ definitions:
             status:
                 type: string
                 description: Status of the service
-                example: Cumque vel amet sed id provident non.
+                example: Perspiciatis et est.
         example:
-            status: Velit inventore voluptatem provident in nihil.
+            status: Accusantium sunt maiores ut.
+        required:
+            - status

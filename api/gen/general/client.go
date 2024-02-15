@@ -16,12 +16,14 @@ import (
 // Client is the "general" service client.
 type Client struct {
 	HealthCheckEndpoint goa.Endpoint
+	AuthEndpoint        goa.Endpoint
 }
 
 // NewClient initializes a "general" service client given the endpoints.
-func NewClient(healthCheck goa.Endpoint) *Client {
+func NewClient(healthCheck, auth goa.Endpoint) *Client {
 	return &Client{
 		HealthCheckEndpoint: healthCheck,
+		AuthEndpoint:        auth,
 	}
 }
 
@@ -33,4 +35,14 @@ func (c *Client) HealthCheck(ctx context.Context) (res *HealthCheckResult, err e
 		return
 	}
 	return ires.(*HealthCheckResult), nil
+}
+
+// Auth calls the "auth" endpoint of the "general" service.
+func (c *Client) Auth(ctx context.Context) (res *AuthResult, err error) {
+	var ires any
+	ires, err = c.AuthEndpoint(ctx, nil)
+	if err != nil {
+		return
+	}
+	return ires.(*AuthResult), nil
 }

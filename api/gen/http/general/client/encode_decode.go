@@ -59,11 +59,70 @@ func DecodeHealthCheckResponse(decoder func(*http.Response) goahttp.Decoder, res
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("general", "healthCheck", err)
 			}
+			err = ValidateHealthCheckResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("general", "healthCheck", err)
+			}
 			res := NewHealthCheckResultOK(&body)
 			return res, nil
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("general", "healthCheck", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildAuthRequest instantiates a HTTP request object with method and path set
+// to call the "general" service "auth" endpoint
+func (c *Client) BuildAuthRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AuthGeneralPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("general", "auth", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeAuthResponse returns a decoder for responses returned by the general
+// auth endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+func DecodeAuthResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body AuthResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("general", "auth", err)
+			}
+			err = ValidateAuthResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("general", "auth", err)
+			}
+			res := NewAuthResultOK(&body)
+			return res, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("general", "auth", resp.StatusCode, string(body))
 		}
 	}
 }

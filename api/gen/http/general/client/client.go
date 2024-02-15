@@ -21,6 +21,9 @@ type Client struct {
 	// endpoint.
 	HealthCheckDoer goahttp.Doer
 
+	// Auth Doer is the HTTP client used to make requests to the auth endpoint.
+	AuthDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -42,6 +45,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		HealthCheckDoer:     doer,
+		AuthDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -64,6 +68,25 @@ func (c *Client) HealthCheck() goa.Endpoint {
 		resp, err := c.HealthCheckDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("general", "healthCheck", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Auth returns an endpoint that makes HTTP requests to the general service
+// auth server.
+func (c *Client) Auth() goa.Endpoint {
+	var (
+		decodeResponse = DecodeAuthResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildAuthRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AuthDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("general", "auth", err)
 		}
 		return decodeResponse(resp)
 	}

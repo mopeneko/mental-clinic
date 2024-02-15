@@ -15,6 +15,8 @@ import (
 type Service interface {
 	// HealthCheck implements healthCheck.
 	HealthCheck(context.Context) (res *HealthCheckResult, err error)
+	// Auth implements auth.
+	Auth(context.Context) (res *AuthResult, err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -31,11 +33,17 @@ const ServiceName = "general"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"healthCheck"}
+var MethodNames = [2]string{"healthCheck", "auth"}
+
+// AuthResult is the result type of the general service auth method.
+type AuthResult struct {
+	// URL for authorization
+	AuthURL string
+}
 
 // HealthCheckResult is the result type of the general service healthCheck
 // method.
 type HealthCheckResult struct {
 	// Status of the service
-	Status *string
+	Status string
 }

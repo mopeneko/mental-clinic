@@ -20,6 +20,7 @@ import (
 type Server struct {
 	Mounts             []*MountPoint
 	HealthCheck        http.Handler
+	Auth               http.Handler
 	GenHTTPOpenapiJSON http.Handler
 }
 
@@ -55,9 +56,11 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"HealthCheck", "GET", "/health_check"},
+			{"Auth", "GET", "/auth"},
 			{"./gen/http/openapi.json", "GET", "/openapi.json"},
 		},
 		HealthCheck:        NewHealthCheckHandler(e.HealthCheck, mux, decoder, encoder, errhandler, formatter),
+		Auth:               NewAuthHandler(e.Auth, mux, decoder, encoder, errhandler, formatter),
 		GenHTTPOpenapiJSON: http.FileServer(fileSystemGenHTTPOpenapiJSON),
 	}
 }
@@ -68,6 +71,7 @@ func (s *Server) Service() string { return "general" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.HealthCheck = m(s.HealthCheck)
+	s.Auth = m(s.Auth)
 }
 
 // MethodNames returns the methods served.
@@ -76,6 +80,7 @@ func (s *Server) MethodNames() []string { return general.MethodNames[:] }
 // Mount configures the mux to serve the general endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountHealthCheckHandler(mux, h.HealthCheck)
+	MountAuthHandler(mux, h.Auth)
 	MountGenHTTPOpenapiJSON(mux, goahttp.Replace("", "/./gen/http/openapi.json", h.GenHTTPOpenapiJSON))
 }
 
@@ -113,6 +118,50 @@ func NewHealthCheckHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "healthCheck")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "general")
+		var err error
+		res, err := endpoint(ctx, nil)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountAuthHandler configures the mux to serve the "general" service "auth"
+// endpoint.
+func MountAuthHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/auth", f)
+}
+
+// NewAuthHandler creates a HTTP handler which loads the HTTP request and calls
+// the "general" service "auth" endpoint.
+func NewAuthHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		encodeResponse = EncodeAuthResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "auth")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "general")
 		var err error
 		res, err := endpoint(ctx, nil)

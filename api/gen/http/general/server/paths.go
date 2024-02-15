@@ -11,3 +11,8 @@ package server
 func HealthCheckGeneralPath() string {
 	return "/health_check"
 }
+
+// AuthGeneralPath returns the URL path to the general service auth HTTP endpoint.
+func AuthGeneralPath() string {
+	return "/auth"
+}

@@ -15,7 +15,14 @@ import (
 // endpoint HTTP response body.
 type HealthCheckResponseBody struct {
 	// Status of the service
-	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+	Status string `form:"status" json:"status" xml:"status"`
+}
+
+// AuthResponseBody is the type of the "general" service "auth" endpoint HTTP
+// response body.
+type AuthResponseBody struct {
+	// URL for authorization
+	AuthURL string `form:"authURL" json:"authURL" xml:"authURL"`
 }
 
 // NewHealthCheckResponseBody builds the HTTP response body from the result of
@@ -23,6 +30,15 @@ type HealthCheckResponseBody struct {
 func NewHealthCheckResponseBody(res *general.HealthCheckResult) *HealthCheckResponseBody {
 	body := &HealthCheckResponseBody{
 		Status: res.Status,
+	}
+	return body
+}
+
+// NewAuthResponseBody builds the HTTP response body from the result of the
+// "auth" endpoint of the "general" service.
+func NewAuthResponseBody(res *general.AuthResult) *AuthResponseBody {
+	body := &AuthResponseBody{
+		AuthURL: res.AuthURL,
 	}
 	return body
 }
